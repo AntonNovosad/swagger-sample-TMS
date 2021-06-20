@@ -24,8 +24,8 @@ public class StoreService {
         return storeDao.getById(order.getId());
     }
 
-    public void delete(Order order) {
-        Optional<Order> byId = storeDao.getById(order.getId());
+    public void delete(long id) {
+        Optional<Order> byId = storeDao.getById(id);
         if (byId.isPresent()) {
             storeDao.delete(byId.get());
         }

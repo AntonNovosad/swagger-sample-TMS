@@ -1,28 +1,41 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Order;
-import org.apache.catalina.Store;
+import com.example.demo.service.StoreService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/store/order")
+@RequestMapping("store")
 public class StoreController {
-    private List<Order> storeList = new ArrayList<>();
+    @Autowired
+    StoreService storeService;
 
-    @PostMapping
+    @PostMapping("/order")
     public ResponseEntity<Order> save(@RequestBody Order order) {
-        if (storeList.add(order)) {
-            return new ResponseEntity<>(order, HttpStatus.ACCEPTED);
+        Optional<Order> optionalOrder = storeService.save(order);
+        if (optionalOrder.isPresent()) {
+            return new ResponseEntity<>(optionalOrder.get(), HttpStatus.ACCEPTED);
         } else {
             return new ResponseEntity<>(order, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @DeleteMapping("/order/{orderId}")
+    public void delete(@PathVariable long orderId) {
+        storeService.delete(orderId);
+    }
+
+    @GetMapping("/order/{orderId}")
+    public ResponseEntity<Order> get(@PathVariable long orderId) {
+        Optional<Order> order = storeService.get(orderId);
+        if (order.isPresent()) {
+            return new ResponseEntity<>(order.get(), HttpStatus.ACCEPTED);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }
